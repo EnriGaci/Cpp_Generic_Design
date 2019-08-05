@@ -2,13 +2,23 @@
 //
 
 #include "pch.h"
+#include "Generic_lib.h"
 #include <iostream>
-
-
 
 int main()
 {
     std::cout << "Hello World!\n";
+	// Application code
+	typedef WidgetManager<PrototypeCreator> MyWidgetMgr;
+
+	Widget<char>* pPrototype;
+	MyWidgetMgr mgr;
+	mgr.SetPrototype(pPrototype);
+
+	Widget<char>* wid = mgr.Create();
+
+	wid->Fun();
+
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
