@@ -2,17 +2,20 @@
 
 #include <iostream>
 
-template <class T> class Widget
+class Widget
 {
 public:
-	void Fun();
-	void Clone() { return new Widget<T>(); };
+	void Fun() {};
+	void Clone() {};
 };
+
+
 // OK: specialization of a member function of Widget
-template <> void Widget<char>::Fun()
-{
-	std::cout << "Fun from Widget class\n";
-}
+//template <> void Widget<char>::Fun()
+//{
+//	std::cout << "Fun from Widget class\n";
+//}
+
 
 template <class T, class U> class Gadget
 {
@@ -28,11 +31,16 @@ template <class T, class U> class Gadget
 template <class T>
 struct OpNewCreator
 {
+
 	static T* Create()
 	{
 		return new T;
 	}
+
+protected:
+	~OpNewCreator() {}
 };
+
 template <class T>
 struct MallocCreator
 {
@@ -43,28 +51,38 @@ struct MallocCreator
 		return new(buf) T;
 	}
 };
+
 template <class T>
 struct PrototypeCreator
 {
-	PrototypeCreator(T* pObj = 0)
-		:pPrototype_(pObj)
-	{}
-	T* Create()
-	{
-		return pPrototype_ ? pPrototype_->Clone() : nullptr;
-	}
-	T* GetPrototype() { return pPrototype_; }
-	void SetPrototype(T* pObj) { pPrototype_ = pObj; }
 private:
 	T* pPrototype_;
+
+public:
+	PrototypeCreator(T* pObj = 0) : pPrototype_(pObj) {}
+
+	T* Create()
+	{
+		return pPrototype_ ? pPrototype_->Clone() : 0;
+	}
+
+	T* GetPrototype() { return pPrototype_; }
+
+	void SetPrototype(T* pObj) { pPrototype_ = pObj; }
 };
 
-// Library code
-template <template <class Created> class CreationPolicy = OpNewCreator>
-class WidgetManager : public CreationPolicy<Widget<char>>
+template <template <class> class CreationPolicy = OpNewCreator>
+class WidgetManager : public CreationPolicy<Widget>
 {
 	void DoSomething()
 	{
 		Gadget* pW = CreationPolicy<Gadget>().Create();
 	}
+
+	void SwitchPrototype(Widget* pNewPrototype)
+	{
+		CreationPolicy<Widget>& myPolicy = *this;
+		delete myPolicy.GetPrototype();
+		myPolicy.SetPrototype(pNewPrototype);
+	}
 };

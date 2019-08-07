@@ -9,15 +9,19 @@ int main()
 {
     std::cout << "Hello World!\n";
 	// Application code
-	typedef WidgetManager<PrototypeCreator> MyWidgetMgr;
+	typedef WidgetManager<PrototypeCreator> MyWidgetManager;
 
-	Widget<char>* pPrototype;
-	MyWidgetMgr mgr;
+	Widget* pPrototype = new Widget;
+
+	MyWidgetManager mgr;
 	mgr.SetPrototype(pPrototype);
 
-	Widget<char>* wid = mgr.Create();
+	MyWidgetManager wm;
 
-	wid->Fun();
+	PrototypeCreator<Widget>* pCreator = &wm;
+	//MyWidgetManager* pCreator = &wm;
+
+	delete pCreator;
 
 }
 
